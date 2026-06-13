@@ -2,14 +2,27 @@ from machine import Pin
 from utime import sleep
 import time
 
-onBoard = Pin("LED", Pin.OUT)
-carGreen = Pin(8, Pin.OUT)
-carRed = Pin(10, Pin.OUT)
-carYellow = Pin(9, Pin.OUT)
+from machine import Pin
+import time
 
-pedestrianRed = Pin(18, Pin.OUT)
-pedestrianYellow = Pin(17, Pin.OUT)
-pedestrianGreen = Pin(16, Pin.OUT)
+carGreen = Pin(8, Pin.OUT)
+carYellow = Pin(9, Pin.OUT)
+carRed = Pin(10, Pin.OUT)
+
+pedGreen = Pin(16, Pin.OUT)
+pedYellow = Pin(17, Pin.OUT)
+pedRed = Pin(18, Pin.OUT)
+
+
+def set_car(red, yellow, green):
+    carRed.value(red)
+    carYellow.value(yellow)
+    carGreen.value(green)
+
+
+def set_ped(red, green):
+    pedRed.value(red)
+    pedGreen.value(green)
 
 while True:
     try:
@@ -17,9 +30,9 @@ while True:
         carYellow.value(0)
         carRed.value(0)
         
-        pedestrianGreen.value(0)
-        pedestrianYellow.value(0)
-        pedestrianRed.value(1)
+        pedGreen.value(0)
+        pedYellow.value(0)
+        pedRed.value(1)
         
         time.sleep(3)
         
@@ -27,9 +40,9 @@ while True:
         carYellow.value(0)
         carRed.value(1)
         
-        pedestrianGreen.value(1)
-        pedestrianYellow.value(0)
-        pedestrianRed.value(0)
+        pedGreen.value(1)
+        pedYellow.value(0)
+        pedRed.value(0)
         
         
     except KeyboardInterrupt:
@@ -38,5 +51,6 @@ while True:
 
 onBoard.off()
 carRed.off()
-pedestrianRed.off()
+pedRed.off()
 print("Finished.")
+
