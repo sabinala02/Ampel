@@ -10,6 +10,7 @@ ped_yellow_pin = Pin(17, Pin.OUT)
 ped_red_pin = Pin(18, Pin.OUT)
 
 pedestrian_request = False
+car_request = False
 current = "car_green"
 start_time = ticks_ms()
 
@@ -23,34 +24,34 @@ def set_ped(red, yellow, green):
     ped_yellow_pin.value(yellow)
     ped_green_pin.value(green)
 
-def car_green():
+def show_car_green():
     set_car(0, 0, 1)
     set_ped(1, 0, 0)
-    
-def car_yellow():
+
+def show_car_yellow():
     set_car(0, 1, 0)
     set_ped(1, 0, 0)
-    
-def car_red():
-    set_car(0, 1, 0)
+
+def show_car_red():
     set_car(1, 0, 0)
-    
-def car_red_yellow():
+    set_ped(1, 0, 0)
+
+def show_car_red_yellow():
     set_car(1, 1, 0)
     set_ped(1, 0, 0)
 
-def pedestrian_green():
-    set_ped(0, 0, 1)
+def show_ped_green():
     set_car(1, 0, 0)
+    set_ped(0, 0, 1)
 
-def pedestrian_yellow():
+def show_ped_yellow():
     set_car(1, 0, 0)
     set_ped(0, 1, 0)
 
 def request_pedestrian():
     global pedestrian_request
     pedestrian_request = True
-    
+
 def request_car():
     global car_request
     car_request = True
@@ -61,25 +62,49 @@ def update_traffic_light():
     now = ticks_ms()
 
     if current == "car_green":
-        car_green()
+        show_car_green()
         if pedestrian_request:
-            car_yellow()
+            show_car_yellow()
             sleep_ms(2000)
-            car_red()
+            show_car_red()
             sleep_ms(1000)
-            pedestrian_green()
+            show_ped_green()
             current = "pedestrian_green"
             start_time = ticks_ms()
             pedestrian_request = False
 
     elif current == "pedestrian_green":
-        pedestrian_green()
+        show_ped_green()
         if ticks_diff(now, start_time) >= 5000 or car_request:
-            pedestrian_yellow()
+            show_ped_yellow()
             sleep_ms(1000)
-            car_red_yellow()
+            show_car_red_yellow()
             sleep_ms(2000)
-            car_green()
+            show_car_green()
             current = "car_green"
             start_time = ticks_ms()
             car_request = False
+
+    elif current == "car_yellow":
+        show_car_yellow()
+        sleep_ms(2000)
+        show_car_red()
+        current = "car_red"
+        start_time = ticks_ms()
+    
+    elif current == "car_red":
+        show_car_red()
+    
+    elif current == "car_red_yellow":
+        show_car_red_yellow()
+        sleep_ms(2000)
+        show_car_green()
+        current = "car_green"
+        start_time = ticks_ms()
+    
+    elif current == "pedestrian_yellow":
+        show_ped_yellow()
+        sleep_ms(1000)
+        show_car_red_yellow()
+        current = "car_red_yellow"
+        start_time = ticks_ms()
