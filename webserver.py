@@ -12,15 +12,28 @@ while ap.active() == False:
     pass
 print('Connection successful')
 print(ap.ifconfig())
-html = """<!DOCTYPE html>
+html = """
+<!DOCTYPE html>
 <html>
-<head> <title>Pico W</title> </head>
-<body> <h1>Pico W</h1>
-<p>Hello from Pico W.</p>
+<head>
+    <title>Ampelsteuerung</title>
+</head>
+<body>
+    <h1>Ampelsteuerung</h1>
+
+    <form action="/pedestrian">
+        <button type="submit">Fußgänger wartet</button>
+    </form>
+
+    <br>
+
+    <form action="/car">
+        <button type="submit">Auto wartet</button>
+    </form>
+
 </body>
 </html>
 """
-
 addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
 s = socket.socket()
 s.bind(addr)
