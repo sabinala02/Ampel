@@ -9,6 +9,10 @@ ped_green_pin = Pin(16, Pin.OUT)
 ped_yellow_pin = Pin(17, Pin.OUT)
 ped_red_pin = Pin(18, Pin.OUT)
 
+pedestrian_request = False
+current = "car_green"
+start_time = ticks_ms()
+
 def set_car(red, yellow, green):
     car_red_pin.value(red)
     car_yellow_pin.value(yellow)
@@ -67,4 +71,3 @@ def update_traffic_light():
             car_to_red_yellow()
             current = "car_green"
             start_time = now
-
