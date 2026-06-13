@@ -76,3 +76,6 @@ while True:
     except OSError as e:
         cl.close()
         print('connection closed')
+        
+    update_traffic_light()
+    sleep_ms(100)
