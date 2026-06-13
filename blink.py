@@ -10,14 +10,14 @@ ped_yellow_pin = Pin(17, Pin.OUT)
 ped_red_pin = Pin(18, Pin.OUT)
 
 def set_car(red, yellow, green):
-    car_red.value(red)
-    car_yellow.value(yellow)
-    car_green.value(green)
+    car_red_pin.value(red)
+    car_yellow_pin.value(yellow)
+    car_green_pin.value(green)
 
 def set_ped(red, yellow, green):
-    ped_red.value(red)
-    ped_yellow.value(yellow)
-    ped_green.value(green)
+    ped_red_pin.value(red)
+    ped_yellow_pin.value(yellow)
+    ped_green_pin.value(green)
 
 def car_green():
     set_car(0, 0, 1)
