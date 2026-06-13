@@ -2,65 +2,77 @@ import socket
 import network
 from blink import cars_green, switch_to_pedestrians
 
-ssid = '{insertSSID}'
-password = '{insertSSID-PW}'
-access_point = network.WLAN(network.AP_IF)
-access_point.config(essid=ssid, password=password)
-access_point.active(True)
+ssid = 'ampel-WS'
+password = '12345678'
 
-while access_point.active() == False:
+ap = network.WLAN(network.AP_IF)
+ap.config(essid=ssid, password=password)
+ap.active(True)
+
+while ap.active() == False:
     pass
 
-print('Connection successful')
-print(access_point.ifconfig())
+print("Connection successful")
+print(ap.ifconfig())
 
-html = """
+html_page = """
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Ampelsteuerung</title>
 </head>
 <body>
     <h1>Ampelsteuerung</h1>
 
-    <form action="/pedestrian">
-        <button type="submit">Fußgänger wartet</button>
-    </form>
+    <button onclick="sendRequest('/pedestrian')">Fußgänger wartet</button>
+    <button onclick="sendRequest('/car')">Auto wartet</button>
 
-    <br>
+    <p id="status">Bereit</p>
 
-    <form action="/car">
-        <button type="submit">Auto wartet</button>
-    </form>
+    <script>
+        async function sendRequest(path) {
+            try {
+                await fetch(path);
+            } catch (error) {
+                document.getElementById("status").textContent = "Fehler beim Senden";
+            }
+        }
+    </script>
 </body>
 </html>
 """
 
-address = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-server_socket = socket.socket()
-server_socket.bind(address)
-server_socket.listen(1)
+addr = socket.getaddrinfo("0.0.0.0", 80)[0][-1]
+s = socket.socket()
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(addr)
+s.listen(1)
 
-print('listening on', address)
+print("listening on", addr)
 cars_green()
 
 while True:
     try:
-        client_connection, address = server_socket.accept()
-        request = client_connection.recv(1024).decode()
-        print(request)
+        cl, addr = s.accept()
+        print("client connected from", addr)
+        request_message = cl.recv(1024)
+        print(request_message)
 
-        if "/pedestrian" in request:
+        if "/pedestrian" in request_message:
             switch_to_pedestrians()
-        elif "/car" in request:
+        elif "/car" in request_message:
             cars_green()
 
-        response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n" + html
-        client_connection.send(response)
-        client_connection.close()
+        response_message = (
+            "HTTP/1.0 200 OK\r\n"
+            "Content-type: text/html\r\n"
+            "Connection: close\r\n\r\n"
+            + html_page
+        )
+        cl.send(response_message)
+        cl.close()
 
-    except OSError:
-        try:
-            client_connection.close()
-        except:
-            pass
+    except OSError as e:
+        cl.close()
+        print('connection closed')
