@@ -1,6 +1,7 @@
 import socket
 import network
-from blink import cars_green, switch_to_pedestrians
+from utime import sleep_ms
+from blink import request_pedestrian, request_car, update_traffic_light
 
 ssid = 'ampel-WS'
 password = '12345678'
@@ -50,7 +51,6 @@ s.bind(addr)
 s.listen(1)
 
 print("listening on", addr)
-cars_green()
 
 while True:
     try:
@@ -60,9 +60,9 @@ while True:
         print(request_message)
 
         if "/pedestrian" in request_message:
-            switch_to_pedestrians()
+            request_pedestrian()
         elif "/car" in request_message:
-            cars_green()
+            request_car()
 
         response_message = (
             "HTTP/1.0 200 OK\r\n"
