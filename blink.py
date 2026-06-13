@@ -20,37 +20,49 @@ def set_car(red, yellow, green):
     carGreen.value(green)
 
 
-def set_ped(red, green):
+def set_ped(red, yellow, green):
     pedRed.value(red)
+    pedYellow.value(yellow)
     pedGreen.value(green)
+    
+def cars_green():
+    set_car(0, 0, 1)
+    set_ped(1, 0, 0)
 
-while True:
-    try:
-        carGreen.value(1)
-        carYellow.value(0)
-        carRed.value(0)
-        
-        pedGreen.value(0)
-        pedYellow.value(0)
-        pedRed.value(1)
-        
-        time.sleep(3)
-        
-        carGreen.value(0)
-        carYellow.value(0)
-        carRed.value(1)
-        
-        pedGreen.value(1)
-        pedYellow.value(0)
-        pedRed.value(0)
-        
-        
-    except KeyboardInterrupt:
-        break
-    sleep(1) # sleep 1sec
+def switch_to_pedestrians():
 
-onBoard.off()
+    # Grün, Orange
+    set_car(0,1,0)
+    time.sleep(2)
+
+    # Rot
+    set_car(1,0,0)
+    time.sleep(1)
+
+    # Grün
+    set_ped(0,0,1)
+
+    time.sleep(5)
+    
+    set_ped(0,1,0)
+    time.sleep(1)
+
+    # Rot
+    set_ped(1,0,0)
+
+    # Rot + Orange
+    set_car(1,1,0)
+    time.sleep(2)
+
+    # Grün
+    set_car(0,0,1)
+    
+waiting_cars = False
+waiting_pedestrians = True
+
+if waiting_pedestrians:
+    switch_to_pedestrians()
+
 carRed.off()
 pedRed.off()
 print("Finished.")
-
