@@ -1,17 +1,19 @@
 import socket
 import network
-import machine
+from blink import cars_green, switch_to_pedestrians
 
 ssid = '{insertSSID}'
 password = '{insertSSID-PW}'
-led = machine.Pin("LED",machine.Pin.OUT)
-ap = network.WLAN(network.AP_IF)
-ap.config(essid=ssid, password=password)
-ap.active(True)
-while ap.active() == False:
+access_point = network.WLAN(network.AP_IF)
+access_point.config(essid=ssid, password=password)
+access_point.active(True)
+
+while access_point.active() == False:
     pass
+
 print('Connection successful')
-print(ap.ifconfig())
+print(access_point.ifconfig())
+
 html = """
 <!DOCTYPE html>
 <html>
@@ -30,32 +32,35 @@ html = """
     <form action="/car">
         <button type="submit">Auto wartet</button>
     </form>
-
 </body>
 </html>
 """
-addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-s = socket.socket()
-s.bind(addr)
-s.listen(1)
-print('listening on', addr)
-led.off()
 
-# Listen for connections
+address = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+server_socket = socket.socket()
+server_socket.bind(address)
+server_socket.listen(1)
+
+print('listening on', address)
+cars_green()
+
 while True:
     try:
-        cl, addr = s.accept()
-        print('client connected from', addr)
-        request = cl.recv(1024)
-        led.on()
+        client_connection, address = server_socket.accept()
+        request = client_connection.recv(1024).decode()
         print(request)
-        cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-        cl.send(html)
-        cl.close()
-        led.off()
-    except OSError as e:
+
+        if "/pedestrian" in request:
+            switch_to_pedestrians()
+        elif "/car" in request:
+            cars_green()
+
+        response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n" + html
+        client_connection.send(response)
+        client_connection.close()
+
+    except OSError:
         try:
-            cl.close()
+            client_connection.close()
         except:
             pass
-        print('connection closed')
